@@ -1,6 +1,7 @@
 import pygame
 import sys
 from person import Player
+from obstacles import Obstacles
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -11,6 +12,8 @@ player = Player()
 
 ground_pos = (0,player.rect.bottom, WIDTH, HEIGHT)
 
+obstacles = Obstacles((400, 270,20, 10))
+
 while True:
     screen.fill("light blue")
     pygame.draw.rect(screen, "green", ground_pos )
@@ -19,10 +22,11 @@ while True:
             pygame.quit()
             sys.exit()
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
+    if keys[pygame.K_SPACE] and player.status in ("runr","runl", "stay"):
         player.status = "jump"
 
-    if keys[pygame.K_LCTRL]:
+
+    if keys[pygame.K_LCTRL] and player.status in ("runr","runl", "stay"):
         player.status = "roll"
 
     if keys[pygame.K_a]:
@@ -30,8 +34,10 @@ while True:
         if player.status == "jump":
             # player.jump_rotate = True
             player.rect.x -= player.speed
+            player.collision_rect.x -= player.speed
         elif player.status == "roll":
             player.rect.x -= player.speed
+            player.collision_rect.x -= player.speed
         else:
             player.status = "runl"
 
@@ -40,8 +46,10 @@ while True:
         player.direction = player.directions[1]
         if player.status == "jump":
             player.rect.x += player.speed
+            player.collision_rect.x += player.speed
         elif player.status == "roll":
             player.rect.x += player.speed
+            player.collision_rect.x += player.speed
         else:
             player.status = "runr"
 
@@ -50,7 +58,10 @@ while True:
 
     player.main_status_update(screen)
 
-    pygame.draw.rect(screen, "pink", player.rect, width=3)
+    pygame.draw.rect(screen, "pink", player.rect, width=5)
+    pygame.draw.rect(screen, "blue", player.collision_rect, width=3)
+
+    obstacles.draw(screen)
 
     clock.tick(12)
     pygame.display.flip()
