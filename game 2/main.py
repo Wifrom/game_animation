@@ -1,6 +1,7 @@
 import pygame
 import sys
 from person import Player
+from obstacles import Obstacle
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -9,48 +10,54 @@ WIDTH = 900
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 player = Player()
 
-ground_pos = (0,player.rect.bottom, WIDTH, HEIGHT)
+ground_pos = (0, player.rect.bottom, WIDTH, HEIGHT)
+
+obstacle = Obstacle((400, 270, 20, 10))
 
 while True:
     screen.fill("light blue")
-    pygame.draw.rect(screen, "green", ground_pos )
+    pygame.draw.rect(screen, "green", ground_pos)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        player.status = "jump"
-
-    if keys[pygame.K_LCTRL]:
-        player.status = "roll"
 
     if keys[pygame.K_a]:
         player.direction = player.directions[0]
         if player.status == "jump":
             # player.jump_rotate = True
             player.rect.x -= player.speed
+            player.collision_rect.x -= player.speed
         elif player.status == "roll":
             player.rect.x -= player.speed
+            player.collision_rect.x -= player.speed
         else:
             player.status = "runl"
-
 
     if keys[pygame.K_d]:
         player.direction = player.directions[1]
         if player.status == "jump":
             player.rect.x += player.speed
+            player.collision_rect.x += player.speed
         elif player.status == "roll":
             player.rect.x += player.speed
+            player.collision_rect.x += player.speed
         else:
             player.status = "runr"
 
+    if keys[pygame.K_SPACE] and player.status in ("runl", "runr", "stay"):
+        player.status = "jump"
 
-
+    if keys[pygame.K_LCTRL] and player.status in ("runl", "runr", "stay"):
+        player.status = "roll"
 
     player.main_status_update(screen)
 
+    pygame.draw.rect(screen, "blue", player.collision_rect, width=5)
     pygame.draw.rect(screen, "pink", player.rect, width=3)
+
+    obstacle.draw(screen)
 
     clock.tick(12)
     pygame.display.flip()

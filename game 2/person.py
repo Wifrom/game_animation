@@ -11,10 +11,11 @@ class Player:
 
         self.anim_tick = 0
         self.rect = pygame.Rect(200, 200, 80, 80)
+        self.collision_rect = pygame.Rect(220, 200, 40, 80)
         self.jump_tick = 0
         self.jump_force = 5
         self.status = "stay"
-        self.speed = 3
+        self.speed = 15
         self.roll_speed = 10
         self.roll_tick = 0
         self.load_imgs()
@@ -80,12 +81,14 @@ class Player:
         if self.status == "runr":
             self.draw_runright(display)
             self.rect.x += self.speed
+            self.collision_rect.x += self.speed
             self.status = "stay"
             self.anim_tick += 1
 
         if self.status == "runl":
             self.draw_runleft(display)
             self.rect.x -= self.speed
+            self.collision_rect.x -= self.speed
             self.anim_tick += 1
             self.status = "stay"
 
@@ -110,10 +113,12 @@ class Player:
 
         if self.jump_tick in (1, 2):
             self.rect.y -= self.jump_force
+            self.collision_rect.y -= self.jump_force
             display.blit(jump_images[1], self.rect)
 
         if self.jump_tick in (3, 4):
             self.rect.y -= self.jump_force
+            self.collision_rect.y -= self.jump_force
             display.blit(jump_images[2], self.rect)
 
         if self.jump_tick == 5:
@@ -121,6 +126,7 @@ class Player:
 
         if self.jump_tick in (6, 7):
             self.rect.y += 2 * self.jump_force
+            self.collision_rect.y += 2 * self.jump_force
             display.blit(jump_images[3], self.rect)
 
         if self.jump_tick == 8:
@@ -135,6 +141,9 @@ class Player:
         else:
             roll_images = self.roll_images_right
         if self.roll_tick == 0:
+            self.rect.y += 10
+            self.collision_rect.h -= 40
+            self.collision_rect.y += 40
             display.blit(roll_images[0], self.rect)
 
         if self.roll_tick in (1, 2):
@@ -150,7 +159,7 @@ class Player:
             display.blit(roll_images[3], self.rect)
 
         if self.roll_tick == 8:
+            self.rect.y -= 10
+            self.collision_rect.h += 40
+            self.collision_rect.y -= 40
             display.blit(roll_images[4], self.rect)
-
-        if self.jump_tick == 9:
-            display.blit(roll_images[5], self.rect)
