@@ -11,15 +11,15 @@ class Player:
 
         self.anim_tick = 0
         self.rect = pygame.Rect(200, 200, 80, 80)
-        self.collision_rect = pygame.Rect(220, 200, 40, 80)
         self.jump_tick = 0
-        self.jump_force = 5
+        self.jump_force = 8
         self.status = "stay"
         self.speed = 15
-        self.roll_speed = 10
         self.roll_tick = 0
         self.load_imgs()
         self.direction = self.directions[1]
+        self.collision_rect = pygame.Rect(220, 200, 40, 80)
+        self.is_obstacles = False
 
     def load_imgs(self):
         self.runright_images = (pygame.transform.scale(pygame.image.load("img/runright1.png"), (80, 80)),
@@ -141,11 +141,10 @@ class Player:
         else:
             roll_images = self.roll_images_right
         if self.roll_tick == 0:
+            display.blit(roll_images[0], self.rect)
             self.rect.y += 10
             self.collision_rect.h -= 40
             self.collision_rect.y += 40
-            display.blit(roll_images[0], self.rect)
-
         if self.roll_tick in (1, 2):
             display.blit(roll_images[1], self.rect)
 
@@ -159,7 +158,13 @@ class Player:
             display.blit(roll_images[3], self.rect)
 
         if self.roll_tick == 8:
+            display.blit(roll_images[4], self.rect)
             self.rect.y -= 10
             self.collision_rect.h += 40
             self.collision_rect.y -= 40
-            display.blit(roll_images[4], self.rect)
+
+    def change_collision_status(self, obstacle_list):
+        flag = False
+        for o in obstacle_list:
+            flag = flag or o.is_collision
+        self.is_obstacles = flag
