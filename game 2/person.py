@@ -20,6 +20,7 @@ class Player:
         self.direction = self.directions[1]
         self.collision_rect = pygame.Rect(220, 200, 40, 80)
         self.is_obstacles = False
+        self.previous_direction = True
 
     def load_imgs(self):
         self.runright_images = (pygame.transform.scale(pygame.image.load("img/runright1.png"), (80, 80)),
@@ -60,7 +61,11 @@ class Player:
     def main_status_update(self, display):
         self.anim_tick %= 6
         if self.status == "stay":
-            display.blit(self.jump_images_left[5], self.rect)
+            if not self.previous_direction:
+                display.blit(self.jump_images_left[5], self.rect)
+            else:
+                display.blit(pygame.transform.flip(self.jump_images_left[5], True, False), self.rect)
+
 
         if self.status == "jump":
             if self.jump_tick == 10:
@@ -84,6 +89,7 @@ class Player:
             self.collision_rect.x += self.speed
             self.status = "stay"
             self.anim_tick += 1
+            self.previous_direction = True
 
         if self.status == "runl":
             self.draw_runleft(display)
@@ -91,6 +97,7 @@ class Player:
             self.collision_rect.x -= self.speed
             self.anim_tick += 1
             self.status = "stay"
+            self.previous_direction = False
 
     def draw_runright(self, display):
         display.blit(self.runright_images[self.anim_tick], self.rect)
@@ -168,3 +175,15 @@ class Player:
         for o in obstacle_list:
             flag = flag or o.is_collision
         self.is_obstacles = flag
+
+    def discarding(self, obstacle):
+
+       if obstacle.is_collision:
+           if self.collision_rect.left < obstacle.rect.left:
+                self.collision_rect.right = obstacle.rect.left
+           else:
+                self.collision_rect.left = obstacle.rect.right
+
+    def alignment(self):
+
+            self.rect.centerx = self.collision_rect.centerx
